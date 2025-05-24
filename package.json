@@ -3,7 +3,7 @@
   "displayName": "PICO-8 Token Tracker",
   "description": "Tracks and visualizes token usage across all .p8 files in a PICO-8 project.",
   "version": "0.0.1",
-  "publisher": "your-identifier",
+  "publisher": "Mesgegra",
   "engines": {
     "vscode": "^1.80.0"
   },
