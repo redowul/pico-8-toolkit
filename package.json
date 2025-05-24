@@ -1,0 +1,72 @@
+{
+  "name": "pico-8-directory",
+  "displayName": "PICO-8 Directory",
+  "description": "Enables \"Go to Definition\" and \"Find References\" across multiple .p8 files in the same directory for PICO-8 projects.",
+  "version": "0.0.1",
+  "publisher": "your-identifier",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:pico-8",
+    "onLanguage:pico-8-lua"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "pico-8",
+        "aliases": [
+          "PICO-8"
+        ],
+        "extensions": [
+          ".p8"
+        ]
+      },
+      {
+        "id": "pico-8-lua",
+        "aliases": [
+          "PICO-8 Lua"
+        ],
+        "extensions": [
+          ".lua"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "pico-8-directory.reloadIndex",
+        "title": "PICO-8: Reload Symbol Index"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "pretest": "npm run compile && npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "references": [
+    { "path": "./server" }
+  ]
+}
