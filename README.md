@@ -12,8 +12,13 @@ A Visual Studio Code extension that displays the current token usage across your
 - ✅ Hovering the status bar shows a detailed breakdown by file
 - ✅ Automatically updates when files are changed, opened, or saved
 
+Status bar display example:
+
 ![Status bar token count](images/status-bar.png)
-![Token breakdown tooltip](images/token-tooltip.png)
+
+Tooltip display example:
+
+![Token breakdown tooltip](images/tooltip.png)
 
 ---
 
@@ -23,13 +28,6 @@ A Visual Studio Code extension that displays the current token usage across your
 - Your `.p8` source files should be in the same directory as the workspace root
 
 No additional dependencies required.
-
----
-
-## Known Issues
-
-- Token count does not update for new `.p8` files until they are saved or opened in the editor.
-- Only top-level `.p8` files are tracked—subfolders are ignored for now.
 
 ---
 
