@@ -34,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Set up and show status bar
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBarItem.text = '$(zap) Tokens: ?';
+  statusBarItem.text = '$(debug-breakpoint-log-unverified) Tokens: ?';
   statusBarItem.tooltip = 'PICO-8 token usage';
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
@@ -47,7 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
     remaining: number;
     files: { file: string; count: number }[];
   }) => {
-    statusBarItem.text = `$(zap) ${data.count} / ${data.max}`;
+    statusBarItem.text = `$(debug-breakpoint-log-unverified) ${data.count} / ${data.max}`;
   
     let longestFile = data.fileName;
     if (Array.isArray(data.files)) {
@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const countColumn = longestFile.length + 5; // column where count must start
       const lines: string[] = [];
   
-      lines.push('**Token Usage**');
+      lines.push('**PICO-8 Token Usage**');
       lines.push('```');
       for (const { file, count } of decoded) {
         const countStr = count.toString();
