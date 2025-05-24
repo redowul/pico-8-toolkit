@@ -1,7 +1,7 @@
 {
-  "name": "pico-8-directory",
-  "displayName": "PICO-8 Directory",
-  "description": "Enables \"Go to Definition\" and \"Find References\" across multiple .p8 files in the same directory for PICO-8 projects.",
+  "name": "pico-8-token-tracker",
+  "displayName": "PICO-8 Token Tracker",
+  "description": "Tracks and visualizes token usage across all .p8 files in a directory for PICO-8 projects.",
   "version": "0.0.1",
   "publisher": "your-identifier",
   "engines": {
@@ -19,27 +19,19 @@
     "languages": [
       {
         "id": "pico-8",
-        "aliases": [
-          "PICO-8"
-        ],
-        "extensions": [
-          ".p8"
-        ]
+        "aliases": ["PICO-8"],
+        "extensions": [".p8"]
       },
       {
         "id": "pico-8-lua",
-        "aliases": [
-          "PICO-8 Lua"
-        ],
-        "extensions": [
-          ".lua"
-        ]
+        "aliases": ["PICO-8 Lua"],
+        "extensions": [".lua"]
       }
     ],
     "commands": [
       {
-        "command": "pico-8-directory.reloadIndex",
-        "title": "PICO-8: Reload Symbol Index"
+        "command": "pico-8-token-tracker.reloadIndex",
+        "title": "PICO-8: Reload Token Index"
       }
     ]
   },
