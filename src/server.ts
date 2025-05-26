@@ -94,9 +94,27 @@ function countTokensInLine(line: string): number {
 }
 
 function countTokensInText(text: string): number {
-  const cleaned = text
-    .replace("pico-8 cartridge // http://www.pico-8.com\nversion 36\n__lua__\n", '')
-    .replace(/--\[\[[\s\S]*?\]\]/g, '');
+  // Remove the standard .p8 header block
+  const header = `pico-8 cartridge // http://www.pico-8.com
+version 36
+__lua__
+`;
+  if (text.startsWith(header)) {
+    text = text.slice(header.length);
+  }
+
+  // Stop at first non-code section (e.g., __gfx__, __map__, etc.)
+  const truncateAt = ['__gfx__', '__label__', '__map__', '__sfx__', '__music__'];
+  let minIndex = text.length;
+  for (const header of truncateAt) {
+    const i = text.indexOf(header);
+    if (i !== -1 && i < minIndex) minIndex = i;
+  }
+
+  const truncated = text.slice(0, minIndex);
+
+  // Remove multi-line comments
+  const cleaned = truncated.replace(/--\[\[[\s\S]*?\]\]/g, '');
 
   return cleaned.split('\n').reduce((sum, line) => sum + countTokensInLine(line), 0);
 }
