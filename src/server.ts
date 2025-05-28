@@ -5,6 +5,7 @@ import * as fs from 'fs';
 
 const connection = createConnection();
 const documents = new TextDocuments(TextDocument);
+let selectedFilePaths: Set<string> | null = null;
 
 const TOKEN_MAX = 8192;
 
@@ -128,11 +129,18 @@ function countTokensInFile(filePath: string): { fileName: string, count: number 
 }
 
 function countTokensInDirectory(dirPath: string): { fileName: string, count: number }[] {
-  return fs.readdirSync(dirPath)
+  const allFiles = fs.readdirSync(dirPath)
     .filter(f => f.endsWith('.p8'))
-    .map(f => path.join(dirPath, f))
-    .filter(p => fs.statSync(p).isFile())
-    .map(countTokensInFile);
+    .map(f => path.resolve(path.join(dirPath, f)))
+    .filter(p => fs.statSync(p).isFile());
+
+  const usingSelection = selectedFilePaths !== null;
+
+  const filesToCount = usingSelection
+    ? allFiles.filter(p => selectedFilePaths!.has(p))
+    : allFiles;    
+
+  return filesToCount.map(countTokensInFile);
 }
 
 connection.onInitialize((_params: InitializeParams) => ({
@@ -150,6 +158,11 @@ documents.onDidSave(() => sendTotalTokenStatus());
 documents.onDidChangeContent(() => sendTotalTokenStatus());
 connection.onDidChangeWatchedFiles((_params: DidChangeWatchedFilesParams) => sendTotalTokenStatus());
 
+connection.onNotification('pico8/updateSelectedFiles', (paths: string[]) => {
+  selectedFilePaths = new Set(paths.map(p => path.resolve(p)));
+  sendTotalTokenStatus();
+});
+
 function sendTotalTokenStatus() {
     const dirPath = process.cwd();
   
@@ -162,16 +175,21 @@ function sendTotalTokenStatus() {
       fileCounts[fileName] = count;
     }
   
-    // Override with open/in-memory versions
     for (const doc of documents.all()) {
-        const fileName = decodeURIComponent(path.basename(new URL(doc.uri).pathname));
-        if (fileName.endsWith('.p8')) {
-            const text = doc.getText();
-            const firstLine = text.split('\n')[0].trim();
-            const count = firstLine === '__gfx__' ? 0 : countTokensInText(text);
-            fileCounts[fileName] = count; // overwrite disk count
-        }
-    }
+      const fsPath = path.resolve(new URL(doc.uri).pathname);
+      const fileName = path.basename(fsPath);
+    
+      // Only include if: either we're not using selection, or this file was selected
+      const usingSelection = selectedFilePaths !== null;
+      const shouldInclude = !usingSelection || (selectedFilePaths !== null && selectedFilePaths.has(fsPath));
+      // If the file is already counted from disk, skip it
+      if (shouldInclude && fileName.endsWith('.p8')) {
+        const text = doc.getText();
+        const firstLine = text.split('\n')[0].trim();
+        const count = firstLine === '__gfx__' ? 0 : countTokensInText(text);
+        fileCounts[fileName] = count;
+      }
+    }    
   
     // Compute total from final merged set
     const totalCount = Object.values(fileCounts).reduce((a, b) => a + b, 0);

@@ -33,7 +33,23 @@
         "command": "pico-8-token-tracker.reloadIndex",
         "title": "PICO-8: Reload Token Index"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "PICO-8 Token Tracker",
+      "properties": {
+        "pico8Directory.outputPath": {
+          "type": "string",
+          "default": "",
+          "description": "The full output path for the combined .p8 file. Example: /your/project/build/combined.p8",
+          "markdownDescription": "Path where the combined `.p8` file will be saved when using auto compile."
+        }
+      }
+    }
+  },
+  "pico8Directory.outputPath": {
+  "type": "string",
+  "default": "",
+  "description": "Absolute path to save the compiled .p8 file when using auto-compile."
   },
   "scripts": {
     "compile": "tsc -p ./",
