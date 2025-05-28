@@ -1,8 +1,8 @@
 {
-  "name": "pico-8-token-tracker",
-  "displayName": "PICO-8 Token Tracker",
-  "description": "Tracks and visualizes token usage across all .p8 files in a PICO-8 project.",
-  "version": "1.0.1",
+  "name": "pico-8-toolkit",
+  "displayName": "PICO-8 Toolkit",
+  "description": "Manage token usage and compile multi-file .p8 projects in PICO-8.",
+  "version": "1.1.0",
   "publisher": "Mesgegra",
   "engines": {
     "vscode": "^1.80.0"
@@ -30,12 +30,16 @@
     ],
     "commands": [
       {
-        "command": "pico-8-token-tracker.reloadIndex",
-        "title": "PICO-8: Reload Token Index"
+        "command": "pico-8-directory.autoCompile",
+        "title": "PICO-8: Auto Compile"
+      },
+      {
+        "command": "pico-8-directory.selectFiles",
+        "title": "PICO-8: Select Files"
       }
     ],
     "configuration": {
-      "title": "PICO-8 Token Tracker",
+      "title": "PICO-8 Toolkit",
       "properties": {
         "pico8Directory.outputPath": {
           "type": "string",
@@ -45,11 +49,6 @@
         }
       }
     }
-  },
-  "pico8Directory.outputPath": {
-  "type": "string",
-  "default": "",
-  "description": "Absolute path to save the compiled .p8 file when using auto-compile."
   },
   "scripts": {
     "compile": "tsc -p ./",
@@ -78,11 +77,11 @@
     { "path": "./server" }
   ],
   "repository": {
-  "type": "git",
-  "url": "https://github.com/redowul/pico-8-token-tracker"
+    "type": "git",
+    "url": "https://github.com/redowul/pico-8-toolkit"
   },
   "bugs": {
-    "url": "https://github.com/redowul/pico-8-token-tracker/issues"
+    "url": "https://github.com/redowul/pico-8-toolkit/issues"
   },
-  "homepage": "https://github.com/redowul/pico-8-token-tracker#readme"
+  "homepage": "https://github.com/redowul/pico-8-toolkit#readme"
 }
