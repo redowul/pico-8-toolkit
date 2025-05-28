@@ -18,19 +18,19 @@ Allows combining multiple .p8 source files down into a single combined cartridge
 - ✅ Toolbar button to auto-generate a combined file with `-- 8>` tabs per section
 - ✅ Optional quick compile command with preconfigured output path
 
-Status bar display example:
+Status bar display:
 
 ![Status bar token count](images/status-bar.png)
 
-Tooltip display example:
+Tooltip display:
 
 ![Token breakdown tooltip](images/tooltip.png)
 
-Dialogue display example:
+Dialogue display:
 
 ![File radiobutton dialogue](images/dialogue.png)
 
-Combine files tooltip example:
+Combine files tooltip:
 
 ![Combine files tooltip](images/combine.png)
 
