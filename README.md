@@ -30,6 +30,9 @@ Dialogue display example:
 
 ![File radiobutton dialogue](images/dialogue.png)
 
+Combine files tooltip example:
+
+![Combine files tooltip](images/combine.png)
 
 ---
 
