@@ -4,6 +4,7 @@
   "description": "Manage token usage and compile multi-file .p8 projects in PICO-8.",
   "version": "1.2.0",
   "publisher": "Mesgegra",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -19,13 +20,21 @@
     "languages": [
       {
         "id": "pico-8",
-        "aliases": ["PICO-8"],
-        "extensions": [".p8"]
+        "aliases": [
+          "PICO-8"
+        ],
+        "extensions": [
+          ".p8"
+        ]
       },
       {
         "id": "pico-8-lua",
-        "aliases": ["PICO-8 Lua"],
-        "extensions": [".lua"]
+        "aliases": [
+          "PICO-8 Lua"
+        ],
+        "extensions": [
+          ".lua"
+        ]
       }
     ],
     "commands": [
@@ -66,7 +75,8 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.25.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1",
@@ -74,7 +84,9 @@
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "references": [
-    { "path": "./server" }
+    {
+      "path": "./server"
+    }
   ],
   "repository": {
     "type": "git",

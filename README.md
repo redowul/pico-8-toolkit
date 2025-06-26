@@ -85,7 +85,7 @@ No additional dependencies required.
 ## License
 
 [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)  
-You are free to use, modify, and share this project, with credit.
+You are free to use, modify, and share this project (with the exception of the icon), with credit.
 
 ---
 
