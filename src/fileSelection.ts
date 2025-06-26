@@ -15,8 +15,9 @@ export function registerFileSelectionCommand(
       const previouslySelected = new Set(stored ?? []);
       const isFirstTime = stored === undefined;
 
-      const selectableItems = allFiles.map(uri => ({
+      const selectableItems = allFiles.map((uri) => ({
         label: vscode.workspace.asRelativePath(uri),
+        detail: uri.fsPath, // store full path here
         picked: isFirstTime ? true : previouslySelected.has(uri.fsPath),
         alwaysShow: true
       }));
@@ -26,7 +27,7 @@ export function registerFileSelectionCommand(
       quickPick.placeholder = 'Toggle files to include for token counting and compilation';
       quickPick.canSelectMany = true;
       quickPick.items = selectableItems;
-      quickPick.selectedItems = selectableItems.filter(item => item.picked);
+      quickPick.selectedItems = selectableItems.filter((item: { picked: any; }) => item.picked);
       quickPick.buttons = [
         {
           iconPath: new vscode.ThemeIcon('file-code'),
@@ -36,10 +37,7 @@ export function registerFileSelectionCommand(
 
       const resolvePaths = () =>
         quickPick.selectedItems
-          .map(item => {
-            const match = allFiles.find(f => vscode.workspace.asRelativePath(f) === item.label);
-            return match?.fsPath ?? '';
-          })
+          .map(item => item.detail?.toString() ?? '')
           .filter(Boolean);
 
       quickPick.onDidAccept(async () => {

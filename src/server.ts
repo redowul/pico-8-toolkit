@@ -128,21 +128,6 @@ function countTokensInFile(filePath: string): { fileName: string, count: number 
   return { fileName: path.basename(filePath), count };
 }
 
-function countTokensInDirectory(dirPath: string): { fileName: string, count: number }[] {
-  const allFiles = fs.readdirSync(dirPath)
-    .filter(f => f.endsWith('.p8'))
-    .map(f => path.resolve(path.join(dirPath, f)))
-    .filter(p => fs.statSync(p).isFile());
-
-  const usingSelection = selectedFilePaths !== null;
-
-  const filesToCount = usingSelection
-    ? allFiles.filter(p => selectedFilePaths!.has(p))
-    : allFiles;    
-
-  return filesToCount.map(countTokensInFile);
-}
-
 connection.onInitialize((_params: InitializeParams) => ({
   capabilities: {
     textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -164,10 +149,19 @@ connection.onNotification('pico8/updateSelectedFiles', (paths: string[]) => {
 });
 
 function sendTotalTokenStatus() {
-    const dirPath = process.cwd();
-  
-    // Load all .p8 files from disk
-    const diskCounts = countTokensInDirectory(dirPath);
+    let diskCounts: { fileName: string; count: number }[] = [];
+
+    if (selectedFilePaths && selectedFilePaths.size > 0) {
+      diskCounts = [...selectedFilePaths].map(countTokensInFile);
+    } else {
+      const cwd = process.cwd();
+      const allFiles = fs.readdirSync(cwd)
+        .filter(f => f.endsWith('.p8'))
+        .map(f => path.resolve(path.join(cwd, f)))
+        .filter(p => fs.statSync(p).isFile());
+
+      diskCounts = allFiles.map(countTokensInFile);
+    }
     const fileCounts: Record<string, number> = {};
   
     // Start with disk counts
