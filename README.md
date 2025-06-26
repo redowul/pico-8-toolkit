@@ -1,4 +1,4 @@
-# PICO-8 Toolkit
+# PICO-8 Toolkit 
 
 A Visual Studio Code extension that displays the current token usage across your entire PICO-8 project directory. Ideal for keeping track of the 8192 token limit in multi-file `.p8` projects.
 

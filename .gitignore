@@ -1,5 +1,14 @@
-out
-dist
-node_modules
+# Ignore raw source
+src/
+*.ts
+*.map
+
+# Ignore dev dependencies
+node_modules/
+.vscode/
 .vscode-test/
+out/
 *.vsix
+tsconfig.json
+webpack.config.js
+.png
