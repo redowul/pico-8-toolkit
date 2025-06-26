@@ -62,19 +62,19 @@ No additional dependencies required.
 
 ## Release Notes
 
-### 1.2.0
+### 1.2
 
 - Token count now calculates the sum of all selected .p8 files, regardless of directory
 - Combined file export now strips `#include` statements from output
 
-### 1.1.0
+### 1.1
 
 - Add interactive file selector UI
 - Add file combination and export to `.p8`
 - Add `--->8` separator for combined output
 - Add support for auto-compiling to a preset path
 
-### 1.0.0
+### 1.0
 
 - Initial release
 - Live token tracking and status bar output
