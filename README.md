@@ -54,13 +54,18 @@ To enable quick compilation:
 ## Requirements
 
 - VS Code 1.77+  
-- Your `.p8` source files should be in the same directory or a subdirectory of the workspace root
+- .p8 files must be placed in the working directory or any of its children 
 
 No additional dependencies required.
 
 ---
 
 ## Release Notes
+
+### 1.2.0
+
+- Token count now calculates the sum of all selected .p8 files, regardless of directory
+- Combined file export now strips `#include` statements from output
 
 ### 1.1.0
 

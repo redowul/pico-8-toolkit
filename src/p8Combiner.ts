@@ -26,9 +26,15 @@ export async function combineP8Files(context: vscode.ExtensionContext, outputPat
 
     const sections = splitIntoSections(content);
 
-    // Handle __lua__
-    const lua = sections['__lua__']?.trim();
+    // Handle __lua__a
+    let lua = sections['__lua__']?.trim();
     if (lua) {
+      lua = lua
+        .split('\n')
+        .filter(line => !line.trim().startsWith('#include'))
+        .join('\n')
+        .trim();
+
       luaChunks.push(`-->8\n-- ${path.basename(filePath)}\n${lua}`);
     }
 
