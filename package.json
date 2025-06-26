@@ -2,7 +2,7 @@
   "name": "pico-8-toolkit",
   "displayName": "PICO-8 Toolkit",
   "description": "Manage token usage and compile multi-file .p8 projects in PICO-8.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "Mesgegra",
   "icon": "images/icon.png",
   
