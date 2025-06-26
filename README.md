@@ -85,7 +85,7 @@ No additional dependencies required.
 ## License
 
 [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)  
-You are free to use, modify, and share this project (with the exception of the icon), with credit.
+You are free to use, modify, and share the code within this project, with credit. This license does not extend to or include the icon, which is the intellectual property of (@redowul).
 
 ---
 
