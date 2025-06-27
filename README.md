@@ -16,8 +16,8 @@ Includes a bindable `Compile & Run` command to easily run your merged `.p8` file
 - ✅ Hovering the status bar shows a detailed breakdown by file
 - ✅ Automatically updates when files are changed, opened, or saved
 - ✅ Interactive file selector to include/exclude files from token totals
-- ✅ Merge selected `.p8` files into a single output file with the `Compile` command so that PICO-8 can run it
-- ✅ Ensures that each file of your project is read as a unique tab in the internal editor of PICO-8 by appending `-- 8>` to the top of each section
+- ✅ Merge selected `.p8` files into a single output file with the `Compile` command 
+- ✅ Displays each file as a unique tab in the internal editor of PICO-8 
 - ✅ Supports running PICO-8 directly from the IDE with the `Run` command
 - ✅ `Compile & Run` command to merge and run in one step
 - ✅ `Stop` command to terminate the currently running PICO-8 process
