@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { combineP8Files } from 'p8Combiner';
 import { runPico8WithSpawn } from 'pico8ProcessManager';
+import { expandHome } from 'utils';
 
 export function registerFileSelectionCommand(
   context: vscode.ExtensionContext,
@@ -58,22 +59,25 @@ export function registerFileSelectionCommand(
         await context.workspaceState.update(storageKey, selectedPaths);
         client.sendNotification('pico8/updateSelectedFiles', selectedPaths);
 
-        const outputPath = vscode.workspace.getConfiguration('pico8').get<string>('outputPath');
-        if (!outputPath || outputPath.trim() === '') {
+        const outputPathRaw = vscode.workspace.getConfiguration('pico8').get<string>('outputPath');
+        if (!outputPathRaw || outputPathRaw.trim() === '') {
           vscode.window.showErrorMessage('No outputPath set in settings (pico8.outputPath).');
           quickPick.hide();
           return;
         }
 
+        const outputPath = expandHome(outputPathRaw);
+
         switch (button.tooltip) {
           case 'Combine selected files to .p8':
-            await combineP8Files(context);
+            await combineP8Files(context, outputPath);
             vscode.window.showInformationMessage('Files compiled.');
             break;
 
-          case 'Compile & Run selected files':
-            await combineP8Files(context);
+          case 'Combine & Run selected files':
+            await combineP8Files(context, outputPath);
             await runPico8WithSpawn(outputPath);
+            vscode.window.showInformationMessage('PICO-8 launched with combined file.');
             break;
         }
 

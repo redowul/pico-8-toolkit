@@ -41,7 +41,9 @@ export async function combineP8Files(context: vscode.ExtensionContext, outputPat
         .join('\n')
         .trim();
 
-      luaChunks.push(`-->8\n-- ${path.basename(filePath)}\n${lua}`);
+      const isFirst = luaChunks.length === 0;
+      const header = isFirst ? `-- ${path.basename(filePath)}` : `-->8\n-- ${path.basename(filePath)}`;
+      luaChunks.push(`${header}\n${lua}`);
     }
 
     // Handle __gfx__, __map__, etc.
