@@ -38,9 +38,9 @@ Combine files tooltip:
 
 ![Combine files tooltip](images/combine.png)
 
-Run cartredge tooltip:
+Run cartridge tooltip:
 
-![Run cartredge tooltip](images/run.png)
+![Run cartridge tooltip](images/run.png)
 
 ---
 
