@@ -36,7 +36,7 @@ export function registerFileSelectionCommand(
         },
         {
           iconPath: new vscode.ThemeIcon('play'),
-          tooltip: 'Compile & Run selected files'
+          tooltip: 'Combine & Run selected files'
         }
       ];
 
