@@ -7,6 +7,7 @@
     - `PICO-8: Compile and Run` – merges selected files and immediately runs the result in PICO-8
     - `PICO-8: Stop` – stops the currently running PICO-8 process
 - Changed "Auto-Compile" to "Compile" for clarity
+- Added a new button to the file selection UI for the "Compile and Run" command
 
 ### 1.2
 
