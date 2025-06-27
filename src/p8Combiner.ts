@@ -1,8 +1,14 @@
+import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
 const NON_LUA_SECTIONS = ['__gfx__', '__map__', '__sfx__', '__music__', '__label__'];
+
+// Utility to expand ~ to home directory
+function expandHome(p: string): string {
+  return p.startsWith('~') ? path.join(os.homedir(), p.slice(1)) : p;
+}
 
 export async function combineP8Files(context: vscode.ExtensionContext, outputPath?: string): Promise<void> {
   const selectedPaths: string[] | undefined = context.workspaceState.get('pico8.selectedFiles');
@@ -70,21 +76,27 @@ export async function combineP8Files(context: vscode.ExtensionContext, outputPat
   // Determine output path
   const baseDir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
   let resolvedOutputPath = outputPath?.trim();
+  resolvedOutputPath = resolvedOutputPath ? expandHome(resolvedOutputPath) : undefined;
 
+  // Case 1: No path or path is a directory → show dialog
   if (!resolvedOutputPath || !resolvedOutputPath.endsWith('.p8')) {
-    resolvedOutputPath = path.join(resolvedOutputPath || baseDir, 'combined.p8');
+    const defaultPath = path.join(resolvedOutputPath || baseDir, 'combined.p8');
+    const saveUri = await vscode.window.showSaveDialog({
+      defaultUri: vscode.Uri.file(defaultPath),
+      filters: { 'PICO-8 Files': ['p8'] },
+      saveLabel: 'Save Combined .p8'
+    });
+
+    if (!saveUri) {
+      return;
+    }
+
+    resolvedOutputPath = saveUri.fsPath;
   }
 
-  const saveUri = await vscode.window.showSaveDialog({
-    defaultUri: vscode.Uri.file(resolvedOutputPath),
-    filters: { 'PICO-8 Files': ['p8'] },
-    saveLabel: 'Save Combined .p8'
-  });
-
-  if (saveUri) {
-    fs.writeFileSync(saveUri.fsPath, finalOutput, 'utf8');
-    vscode.window.showInformationMessage(`Combined file saved to ${saveUri.fsPath}`);
-  }
+  // Case 2: Save directly to full file path
+  fs.writeFileSync(resolvedOutputPath, finalOutput, 'utf8');
+  vscode.window.showInformationMessage(`Combined file saved to ${resolvedOutputPath}`);
 }
 
 function splitIntoSections(content: string): Record<string, string> {

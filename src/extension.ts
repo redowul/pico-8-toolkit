@@ -5,14 +5,14 @@ import {
   ServerOptions,
   TransportKind
 } from 'vscode-languageclient/node';
-
-import { registerCommands, notifyInitialSelection } from './commands';
-import { initTokenStatus, updateTokenTooltip } from './tokenStatus';
+import { registerCommands, notifyInitialSelection } from 'commands/commands';
+import { initTokenStatus, updateTokenTooltip } from 'tokenStatus';
+import path from 'path';
 
 let client: LanguageClient;
 
 export async function activate(context: vscode.ExtensionContext) {
-  const serverModule = context.asAbsolutePath('out/server.js');
+  const serverModule = context.asAbsolutePath(path.join('dist', 'server.js'));
   const serverOptions: ServerOptions = {
     run: { module: serverModule, transport: TransportKind.ipc },
     debug: { module: serverModule, transport: TransportKind.ipc }
@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   };
 
-  client = new LanguageClient('pico8-directory', 'PICO-8 Directory', serverOptions, clientOptions);
+  client = new LanguageClient('pico-8', 'PICO-8', serverOptions, clientOptions);
   context.subscriptions.push(client);
   await client.start();
 

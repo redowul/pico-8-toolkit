@@ -4,6 +4,8 @@ A Visual Studio Code extension that displays the current token usage across your
 
 Allows combining multiple .p8 source files down into a single combined cartridge for an easier development workflow. 
 
+Includes a bindable `Compile & Run` command to easily run your merged `.p8` file in PICO-8 without leaving your IDE.
+
 ---
 
 ## Features
@@ -14,9 +16,11 @@ Allows combining multiple .p8 source files down into a single combined cartridge
 - ✅ Hovering the status bar shows a detailed breakdown by file
 - ✅ Automatically updates when files are changed, opened, or saved
 - ✅ Interactive file selector to include/exclude files from token totals
-- ✅ Compile selected `.p8` files into a single output file
-- ✅ Toolbar button to auto-generate a combined file with `-- 8>` tabs per section
-- ✅ Optional quick compile command with preconfigured output path
+- ✅ Merge selected `.p8` files into a single output file with the `Compile` command so that PICO-8 can run it
+- ✅ Ensures that each file of your project is read as a unique tab in the internal editor of PICO-8 by appending `-- 8>` to the top of each section
+- ✅ Supports running PICO-8 directly from the IDE with the `Run` command
+- ✅ `Compile & Run` command to merge and run in one step
+- ✅ `Stop` command to terminate the currently running PICO-8 process
 
 Status bar display:
 
@@ -37,17 +41,22 @@ Combine files tooltip:
 ---
 
 ## Usage
+- Select Files for Compilation and Token Tracking
+    - Click the token count in the status bar, or run PICO-8: Select Files from the Command Palette.
+    - Use the checkboxes to select .p8 files.
+    - Click the toolbar icon or run PICO-8: Compile to merge selected files together.
 
-To select files for inclusion in token tracking and compilation:
+- Configure Quick Compilation
+    - Set pico8.outputPath in your settings:
+        - Use a directory path to be prompted for a filename.
+        - Use a full .p8 file path to save directly (overwrites without confirmation).
+    - Set pico8.pico8Path to the full path of your PICO-8 binary (e.g. /home/user/apps/pico8/pico8).
 
-1. Click the status bar token count or run `PICO-8: Select Files` from the Command Palette.
-2. Use the checkboxes to toggle files.
-3. Use the toolbar icon to combine selected files into one `.p8`.
-
-To enable quick compilation:
-
-1. Set a value for `pico8Directory.outputPath` in your VS Code settings.
-2. Run `PICO-8: Auto Compile` (optionally bind a key for fast use).
+- Commands
+    - PICO-8: Compile – Merge selected files into one .p8
+    - PICO-8: Run – Launch PICO-8 with the output file (Raw file only)
+    - PICO-8: Compile and Run – Merge and run in one step (Strips `#include` statements and appends `--->8` separators)
+    - PICO-8: Stop – Stop the currently running PICO-8 process
 
 ---
 
@@ -60,32 +69,10 @@ No additional dependencies required.
 
 ---
 
-## Release Notes
-
-### 1.2
-
-- Token count now calculates the sum of all selected .p8 files, regardless of directory
-- Combined file export now strips `#include` statements from output
-
-### 1.1
-
-- Add interactive file selector UI
-- Add file combination and export to `.p8`
-- Add `--->8` separator for combined output
-- Add support for auto-compiling to a preset path
-
-### 1.0
-
-- Initial release
-- Live token tracking and status bar output
-- Breakdown tooltip with right-aligned counts
-
----
-
 ## License
 
 [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)  
-You are free to use, modify, and share the code within this project, with credit. This license does not extend to or include the icon, which is the intellectual property of (@redowul).
+You are free to use, modify, and share the code within this project, with credit. This license does not extend to or include the icon, which is the intellectual property of ([@redowul](https://github.com/redowul)).
 
 ---
 

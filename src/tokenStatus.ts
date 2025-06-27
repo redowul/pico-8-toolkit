@@ -6,7 +6,7 @@ export function initTokenStatus(context: vscode.ExtensionContext) {
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBarItem.text = '$(debug-breakpoint-log-unverified) Tokens: ?';
   statusBarItem.tooltip = 'Click to choose which .p8 files are counted';
-  statusBarItem.command = 'pico8-directory.selectFiles'; // ← link to the file selection command
+  statusBarItem.command = 'pico-8.selectFiles'; 
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 }

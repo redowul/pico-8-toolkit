@@ -2,7 +2,7 @@
   "name": "pico-8-toolkit",
   "displayName": "PICO-8 Toolkit",
   "description": "Manage token usage and compile multi-file .p8 projects in PICO-8.",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "publisher": "Mesgegra",
   "icon": "images/icon.png",
   
@@ -40,22 +40,40 @@
     ],
     "commands": [
       {
-        "command": "pico-8-directory.autoCompile",
-        "title": "PICO-8: Auto Compile"
+        "command": "pico-8.compile",
+        "title": "PICO-8: Compile"
       },
       {
-        "command": "pico-8-directory.selectFiles",
+        "command": "pico-8.run",
+        "title": "PICO-8: Run Raw File"
+      },
+      {
+        "command": "pico-8.compileAndRun",
+        "title": "PICO-8: Compile & Run"
+      },
+      {
+        "command": "pico-8.selectFiles",
         "title": "PICO-8: Select Files"
+      },
+      {
+        "command": "pico-8.stop",
+        "title": "PICO-8: Stop PICO-8 Process"
       }
     ],
     "configuration": {
       "title": "PICO-8 Toolkit",
       "properties": {
-        "pico8Directory.outputPath": {
+        "pico8.outputPath": {
           "type": "string",
           "default": "",
           "description": "The full output path for the combined .p8 file. Example: /your/project/build/combined.p8",
           "markdownDescription": "Path where the combined `.p8` file will be saved when using auto compile."
+        },
+        "pico8.pico8Path": {
+          "type": "string",
+          "default": "",
+          "description": "The full path to your PICO-8 binary executable. Example: /home/user/apps/pico8/pico8",
+          "markdownDescription": "Path to the PICO-8 executable. This is used for running a passed .p8 file."
         }
       }
     }

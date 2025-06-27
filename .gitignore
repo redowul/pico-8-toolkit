@@ -11,4 +11,3 @@ out/
 *.vsix
 tsconfig.json
 webpack.config.js
-.png
