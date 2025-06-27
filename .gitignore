@@ -1,6 +1,4 @@
 # Ignore raw source
-src/
-*.ts
 *.map
 
 # Ignore dev dependencies
@@ -9,5 +7,3 @@ node_modules/
 .vscode-test/
 out/
 *.vsix
-tsconfig.json
-webpack.config.js
