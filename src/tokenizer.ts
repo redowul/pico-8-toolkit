@@ -13,18 +13,11 @@ export const SYMBOLS = new Set(['(', '[', '{']);
 export const SPECIALS = new Set(['❎', '🅾', '⬆', '⬇', '⬅', '➡', '❞']); // normalized emojis
 
 function isInteger(str: string): boolean {
-    if (typeof str !== 'string') {
-        return false;
-    } 
-    return str.length > 0 && [...str].every(c => c >= '0' && c <= '9');
+    return typeof str === 'string' && /^[0-9]+$/.test(str);
 }
 
 function isFloat(str: string): boolean {
-    if (typeof str !== 'string') {
-        return false;
-    } 
-    const parts = str.split('.');
-    return parts.length === 2 && isInteger(parts[0]) && isInteger(parts[1]);
+    return typeof str === 'string' && /^[0-9]*\.[0-9]+$/.test(str);
 }
 
 function isNumber(str: string): boolean {
@@ -36,7 +29,7 @@ function isStringLiteral(str: string): boolean {
 }
 
 function isIdentifier(str: string): boolean {
-    // Identifiers can include emojis in PICO-8
+    // Identifiers can include emojis and underscores in PICO-8
     return /^[a-zA-Z_❎🅾⬆⬇⬅➡❞][a-zA-Z0-9_❎🅾⬆⬇⬅➡❞]*$/.test(str);
 }
 
@@ -44,7 +37,7 @@ function isEmoji(char: string): boolean {
     return SPECIALS.has(char);
 }
 
-function tokenize(text: string): string[] {
+export function tokenize(text: string): string[] {
     const tokens: string[] = [];
     const chars = Array.from(text.trim());
     let i = 0;
@@ -71,8 +64,8 @@ function tokenize(text: string): string[] {
             continue;
         }
 
-        // === Identifiers (letters/numbers/emoji mix) ===
-        if (/[a-zA-Z_]/.test(char)) {
+        // === Identifiers (letters/numbers/emoji/underscore mix) ===
+        if (/[a-zA-Z_]/.test(char) || isEmoji(char)) {
             let ident = char;
             i++;
             while (
@@ -86,7 +79,7 @@ function tokenize(text: string): string[] {
             continue;
         }
 
-        // === Numbers (integers or floats) ===
+        // === Numbers (integers, dot-prefix floats, dot-suffix floats) ===
         if (isInteger(char) || (char === '.' && isInteger(chars[i + 1]))) {
             let num = char;
             i++;
@@ -96,20 +89,17 @@ function tokenize(text: string): string[] {
             ) {
                 num += chars[i++];
             }
-            tokens.push(num);
+            // Handle dot-suffix floats like `42.`
+            if (num.endsWith('.') && !num.startsWith('.')) {
+                tokens.push(num);
+            } else {
+                tokens.push(num);
+            }
             lastTokenType = 'number';
             continue;
         }
 
-        // === Operators / negative sign ===
-        if (OPERATORS.has(char) || SYMBOLS.has(char)) {
-            tokens.push(char);
-            lastTokenType = 'other';
-            i++;
-            continue;
-        }
-
-        // === String literals ===
+        // === String literals (unterminated counts as 1 token) ===
         if (char === '"' || char === "'") {
             let quote = char;
             let str = quote;
@@ -117,12 +107,20 @@ function tokenize(text: string): string[] {
             while (i < chars.length && chars[i] !== quote) {
                 str += chars[i++];
             }
-            if (i < chars.length) {
+            if (i < chars.length && chars[i] === quote) {
                 str += quote;
                 i++;
             }
             tokens.push(str);
             lastTokenType = 'other';
+            continue;
+        }
+
+        // === Operators / Symbols ===
+        if (OPERATORS.has(char) || SYMBOLS.has(char)) {
+            tokens.push(char);
+            lastTokenType = 'other';
+            i++;
             continue;
         }
 
@@ -135,8 +133,6 @@ function tokenize(text: string): string[] {
     return tokens;
 }
 
-
-
 function mergeTokens(tokens: string[]): string[] {
     const merged: string[] = [];
     const opMap: Record<string, string> = {
@@ -145,7 +141,7 @@ function mergeTokens(tokens: string[]): string[] {
         '-=': '-=',
         '>=': '>=',
         '<=': '<=',
-        '..': '..', // Add concatenation operator
+        '..': '..' 
     };
 
     let i = 0;
@@ -165,7 +161,6 @@ function mergeTokens(tokens: string[]): string[] {
 
     return merged;
 }
-
 
 function isToken(token: string, p0: string): boolean {
     const allEmojis = [...token].every(char => SPECIALS.has(char));
