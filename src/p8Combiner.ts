@@ -113,7 +113,9 @@ function splitIntoSections(content: string): Record<string, string> {
       current = `__${match[1]}__`;
       sections[current] = [];
     } else {
-      if (!sections[current]) sections[current] = [];
+      if (!sections[current]) {
+        sections[current] = [];
+      }
       sections[current].push(line);
     }
   }
