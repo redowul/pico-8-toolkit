@@ -1,8 +1,9 @@
-export const NON_TOKENS = new Set(['end', ',', ')', '}', ']', ':']);
+// === CONSTANTS ===
+export const NON_TOKENS = new Set(['end', ',', ')', '}', ']', ':', '.']);
 
 export const LITERALS = new Set(['nil', 'false', 'true']);
 export const OPERATORS = new Set([
-    '+', '-', '*', '/', '%', '^', '#', '=', '==', '+=', '-=',
+    '+', '-', '*', '/', '%', '^', '=', '==', '+=', '-=',
     '>=', '<=', '~=', '<', '>', '..', 'and', 'or', 'not'
 ]);
 export const KEYWORDS = new Set([
@@ -10,38 +11,105 @@ export const KEYWORDS = new Set([
     'repeat', 'until', 'function', 'return', 'break'
 ]);
 export const SYMBOLS = new Set(['(', '[', '{']);
-export const SPECIALS = new Set(['❎', '🅾', '⬆', '⬇', '⬅', '➡', '❞']); // normalized emojis
+export const EMOJIS = new Set([
+    '❎', '🅾', '⬆', '⬇', '⬅', '➡', '❞', '⬅️', '➡️', '⬆️', '⬇️'
+]);
+export const SPECIAL_CHARS = new Set(['@', '#', '$', '%', '^', '&', '*']);
 
-function isInteger(str: string): boolean {
-    return typeof str === 'string' && /^[0-9]+$/.test(str);
+// === CHARACTER HELPERS ===
+function isLetter(c: string): boolean {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-function isFloat(str: string): boolean {
-    return typeof str === 'string' && /^[0-9]*\.[0-9]+$/.test(str);
+function isDigit(c: string): boolean {
+    return c >= '0' && c <= '9';
 }
 
+function isUnderscore(c: string): boolean {
+    return c === '_';
+}
+
+function isEmoji(c: string): boolean {
+    return EMOJIS.has(c);
+}
+
+function isIdentifierChar(c: string): boolean {
+    return isLetter(c) || isDigit(c) || isUnderscore(c) || isEmoji(c);
+}
+
+// === TOKEN HELPERS ===
 function isNumber(str: string): boolean {
-    return isInteger(str) || isFloat(str);
+    if (str.length === 0) {return false;}
+    for (const c of str) {
+        if (!isDigit(c) && c !== '.') {return false;}
+    }
+    return true;
 }
 
 function isStringLiteral(str: string): boolean {
-    return (str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"));
+    if (str.length === 0) {return false;}
+
+    const first = str[0];
+    const last = str[str.length - 1];
+
+    // Starts and ends with same quote → valid string
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+        return true;
+    }
+
+    // Unterminated string → starts with quote but no matching end
+    if (first === '"' || first === "'") {
+        return true;
+    }
+
+    return false;
 }
+
 
 function isIdentifier(str: string): boolean {
-    // Identifiers can include emojis and underscores in PICO-8
-    return /^[a-zA-Z_❎🅾⬆⬇⬅➡❞][a-zA-Z0-9_❎🅾⬆⬇⬅➡❞]*$/.test(str);
+    if (str.length === 0) {return false;}
+    if (!isLetter(str[0]) && !isUnderscore(str[0]) && !isEmoji(str[0])) {
+        return false;
+    }
+    for (let i = 1; i < str.length; i++) {
+        if (!isIdentifierChar(str[i])) {return false;}
+    }
+    return true;
 }
 
-function isEmoji(char: string): boolean {
-    return SPECIALS.has(char);
+function isEmojiRun(str: string): boolean {
+    return [...str].every(c => isEmoji(c));
 }
 
+function splitGraphemes(str: string): string[] {
+    const graphemes: string[] = [];
+    let i = 0;
+
+    while (i < str.length) {
+        let cluster = str[i];
+        i++;
+
+        // Merge ZWJ sequences
+        while (i < str.length && str[i] === '\u200D') {
+            cluster += str[i];    // Add ZWJ
+            i++;
+            if (i < str.length) {
+                cluster += str[i]; // Add next emoji
+                i++;
+            }
+        }
+
+        graphemes.push(cluster);
+    }
+
+    return graphemes;
+}
+
+// === TOKENIZER ===
 export function tokenize(text: string): string[] {
     const tokens: string[] = [];
     const chars = Array.from(text.trim());
     let i = 0;
-    let lastTokenType: 'emoji' | 'identifier' | 'number' | 'other' | null = null;
 
     while (i < chars.length) {
         const char = chars[i];
@@ -52,87 +120,112 @@ export function tokenize(text: string): string[] {
             continue;
         }
 
-        // === Emoji run ===
-        if (isEmoji(char)) {
-            if (lastTokenType === 'emoji') {
-                tokens[tokens.length - 1] += char; // merge with last emoji token
-            } else {
-                tokens.push(char);
-            }
-            lastTokenType = 'emoji';
+        // === Dot runs (special logic)
+        if (char === '.') {
+            let dots = '.';
             i++;
+            while (i < chars.length && chars[i] === '.') {
+                dots += chars[i++];
+            }
+
+            if (dots.length === 1) {
+                // Single dots are non-tokens
+                continue;
+            }
+
+            // Group dots into tokens
+            let remaining = dots.length;
+            let offset = 0;
+            while (remaining > 0) {
+                let chunkSize;
+                if (offset === 0) {
+                    // First group is up to 4 dots
+                    chunkSize = Math.min(4, remaining);
+                } else {
+                    // Next groups are of size 3
+                    chunkSize = Math.min(3, remaining);
+                }
+                const chunk = dots.substr(offset, chunkSize);
+                tokens.push(chunk);
+                offset += chunkSize;
+                remaining -= chunkSize;
+            }
             continue;
         }
 
-        // === Identifiers (letters/numbers/emoji/underscore mix) ===
-        if (/[a-zA-Z_]/.test(char) || isEmoji(char)) {
+        // === Identifiers (letters, digits, underscores, emojis merged)
+        if (isLetter(char) || isUnderscore(char) || isEmoji(char)) {
             let ident = char;
             i++;
-            while (
-                i < chars.length &&
-                (/[a-zA-Z0-9_]/.test(chars[i]) || isEmoji(chars[i]))
-            ) {
+            while (i < chars.length && isIdentifierChar(chars[i])) {
                 ident += chars[i++];
             }
             tokens.push(ident);
-            lastTokenType = 'identifier';
             continue;
         }
 
-        // === Numbers (integers, dot-prefix floats, dot-suffix floats) ===
-        if (isInteger(char) || (char === '.' && isInteger(chars[i + 1]))) {
+        // === Numbers (digits only)
+        if (isDigit(char)) {
             let num = char;
             i++;
-            while (
-                i < chars.length &&
-                (isInteger(chars[i]) || chars[i] === '.')
-            ) {
+            while (i < chars.length && (isDigit(chars[i]) || chars[i] === '.')) {
                 num += chars[i++];
             }
-            // Handle dot-suffix floats like `42.`
-            if (num.endsWith('.') && !num.startsWith('.')) {
-                tokens.push(num);
-            } else {
-                tokens.push(num);
-            }
-            lastTokenType = 'number';
+            tokens.push(num);
             continue;
         }
 
-        // === String literals (unterminated counts as 1 token) ===
+        // === String literals (supports escaped quotes and unterminated strings)
         if (char === '"' || char === "'") {
-            let quote = char;
+            const quote = char;
             let str = quote;
             i++;
-            while (i < chars.length && chars[i] !== quote) {
-                str += chars[i++];
-            }
-            if (i < chars.length && chars[i] === quote) {
-                str += quote;
+
+            while (i < chars.length) {
+                const current = chars[i];
+
+                // Handle escaped character: \" stays inside string
+                if (current === '\\' && i + 1 < chars.length) {
+                    str += current + chars[i + 1]; // Add \ and next char
+                    i += 2;
+                    continue;
+                }
+
+                str += current;
                 i++;
+
+                // End string on unescaped quote
+                if (current === quote) {
+                    break; // Close the string properly
+                }
             }
             tokens.push(str);
-            lastTokenType = 'other';
             continue;
         }
 
-        // === Operators / Symbols ===
+        // === Operators / Symbols
         if (OPERATORS.has(char) || SYMBOLS.has(char)) {
             tokens.push(char);
-            lastTokenType = 'other';
             i++;
             continue;
         }
 
-        // === Fallback: single char token ===
+        // === Fallback: single char token
         tokens.push(char);
-        lastTokenType = 'other';
         i++;
     }
 
+    // === FINAL EMOJI RUN COLLAPSE ===
+    if (tokens.length > 1 && tokens.every(t => isEmoji(t))) {
+        tokens.splice(0, tokens.length, tokens.join('')); // collapse into single token
+    }
+
+    console.log('Tokens:', tokens);
     return tokens;
 }
 
+
+// === POST-PROCESSING ===
 function mergeTokens(tokens: string[]): string[] {
     const merged: string[] = [];
     const opMap: Record<string, string> = {
@@ -141,7 +234,7 @@ function mergeTokens(tokens: string[]): string[] {
         '-=': '-=',
         '>=': '>=',
         '<=': '<=',
-        '..': '..' 
+        '..': '..'
     };
 
     let i = 0;
@@ -162,28 +255,28 @@ function mergeTokens(tokens: string[]): string[] {
     return merged;
 }
 
-function isToken(token: string, p0: string): boolean {
-    const allEmojis = [...token].every(char => SPECIALS.has(char));
-
+function isToken(token: string): boolean {
     return (
         LITERALS.has(token) ||
         OPERATORS.has(token) ||
         SYMBOLS.has(token) ||
         KEYWORDS.has(token) ||
-        allEmojis ||
+        SPECIAL_CHARS.has(token) ||
         isNumber(token) ||
         isStringLiteral(token) ||
+        isEmojiRun(token) ||
         (isIdentifier(token) && !NON_TOKENS.has(token) && token !== 'local')
     );
 }
 
+// === COUNTING FUNCTIONS ===
 export function countTokensInLine(line: string): number {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('--') || trimmed.startsWith('//') || trimmed.startsWith('#')) {
+    if (!trimmed || trimmed.startsWith('--') || trimmed.startsWith('//')) {
         return 0;
     }
 
-    const commentIndex = Math.min(...['--', '//', '#'].map(sep => {
+    const commentIndex = Math.min(...['--', '//'].map(sep => {
         const idx = line.indexOf(sep);
         return idx === -1 ? Infinity : idx;
     }));
@@ -193,7 +286,7 @@ export function countTokensInLine(line: string): number {
     const filtered = tokens.filter(t => !NON_TOKENS.has(t));
     const merged = mergeTokens(filtered);
 
-    return merged.filter((token, i, arr) => isToken(token, arr[i + 1])).length;
+    return merged.filter((token) => isToken(token)).length;
 }
 
 export function countTokensInText(text: string): number {
@@ -219,7 +312,11 @@ function stripPico8Header(text: string): string {
     const lines = text.split(/\r?\n/);
     let result = '';
     for (const line of lines) {
-        if (line.startsWith('pico-8 cartridge') || line.startsWith('version') || line.startsWith('__lua__')) {
+        if (
+            line.startsWith('pico-8 cartridge') ||
+            line.startsWith('version') ||
+            line.startsWith('__lua__')
+        ) {
             continue; // skip header
         }
         result += line + '\n';
